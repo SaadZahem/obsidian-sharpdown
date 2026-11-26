@@ -8,5 +8,11 @@ If your plugin does not need CSS, delete this file.
 */
 .obsidian-custom-underline {
   text-decoration: underline !important;
-  font-weight: normal !important;
+  font-weight: normal;
+}
+
+/* Allows bold syntax (**bar**) inside underline text to stay bold */
+.obsidian-custom-underline strong,
+.obsidian-custom-underline b {
+  font-weight: bold !important;
 }

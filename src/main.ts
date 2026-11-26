@@ -10,42 +10,37 @@ import { RangeSetBuilder } from '@codemirror/state';
 
 export default class DoubleUnderlinePlugin extends Plugin {
   async onload() {
-    // 1. Register CodeMirror extension for Live Preview / Editing mode
+    // 1. Register CodeMirror extension for Live Preview
     this.registerEditorExtension(doubleUnderlineViewPlugin);
 
-    // 2. Register Markdown Post Processor for Reading mode
+    // 2. Register Markdown Post Processor for Reading mode (Safe DOM manipulation)
     this.registerMarkdownPostProcessor(this.underlinePostProcessor);
   }
 
-  // Reading Mode Processor
+  // Reading Mode Processor - Safe DOM transformation (No innerHTML)
   private underlinePostProcessor = (element: HTMLElement, context: MarkdownPostProcessorContext) => {
-    // Find text nodes or inline elements containing __text__
-    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null);
-    let node: Node | null;
+    const strongElements = element.querySelectorAll('strong');
 
-    while ((node = walker.nextNode())) {
-      if (node.nodeType === Node.TEXT_NODE && node.textContent) {
-        // Regex matching __text__ but avoiding code blocks or math if necessary
-        const regex = /__([^_]+?)__/g;
-        if (regex.test(node.textContent)) {
-          // Collect matches to process
-          // (Doing it safely outside the walk loop)
+    strongElements.forEach((strongEl) => {
+      const section = context.getSectionInfo(strongEl);
+      if (section) {
+        const sourceText = section.text;
+        const innerText = strongEl.textContent || '';
+        const rawSnippet = `__${innerText}__`;
+        
+        // Verify if this strong tag originated from double underscores
+        if (sourceText.includes(rawSnippet)) {
+          // Safely create a new span element (no innerHTML)
+          const underlineSpan = createSpan();
+          underlineSpan.addClass('obsidian-custom-underline');
+          
+          // Move all child nodes (including nested elements like bold **bar**) safely
+          while (strongEl.firstChild) {
+            underlineSpan.appendChild(strongEl.firstChild);
+          }
+          
+          strongEl.replaceWith(underlineSpan);
         }
-      }
-    }
-
-    // Alternative simpler approach for Reading mode via innerHTML transformation on safe containers:
-    const paragraphs = element.querySelectorAll('p, li, blockquote');
-    paragraphs.forEach((p) => {
-      // Avoid replacing inside code tags
-      if (p.querySelector('code')) return;
-      
-      const html = p.innerHTML;
-      // Replace __text__ with <u class="cm-underline">text</u>
-      // Ensure we don't accidentally break existing single underscores or markdown italics/bold
-      const updatedHtml = html.replace(/__([^_]+?)__/g, '<span class="obsidian-custom-underline">$1</span>');
-      if (updatedHtml !== html) {
-        p.innerHTML = updatedHtml;
       }
     });
   };
@@ -72,7 +67,8 @@ class DoubleUnderlineExtension {
 
   buildDecorations(view: EditorView): DecorationSet {
     const builder = new RangeSetBuilder<Decoration>();
-    const pattern = /__([^_]+?)__/g;
+    // Regex that matches __text__ while accommodating spaces and nested formatting tokens
+    const pattern = /__((?:[^\n_]|_(?!_))+?)__/g;
 
     for (let { from, to } of view.visibleRanges) {
       let text = view.state.doc.sliceString(from, to);
@@ -82,8 +78,6 @@ class DoubleUnderlineExtension {
         let start = from + match.index;
         let end = start + match[0].length;
         
-        // Optional: If you want to hide the underscores and only underline the inner text,
-        // adjust start/end ranges accordingly. This decorates the whole __text__ block.
         builder.add(start, end, underlineDecoration);
       }
     }
