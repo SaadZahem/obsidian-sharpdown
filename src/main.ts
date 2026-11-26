@@ -20,24 +20,33 @@ export default class EnhancedMarker extends Plugin {
     // Reading Mode Processor - Safe DOM transformation (No innerHTML)
     private underlinePostProcessor = (element: HTMLElement, context: MarkdownPostProcessorContext) => {
         const strongElements = element.findAll('strong');
-		const section = context.getSectionInfo(element);
-		if (!section) return;
+        const section = context.getSectionInfo(element);
+        if (!section) return;
 
-		const source = section.text.split("\n").slice(section.lineStart, section.lineEnd + 1).join("\n");
-		const regex = /(^|\s)(\*\*|__)/g;
+        const source = section.text.split("\n").slice(section.lineStart, section.lineEnd + 1).join("\n");
+        const regex = /\*\*|__/g;
 
-		// console.log({ element, context, section, source, });
+        element.dataset.source = source;
+        console.log("process", { element, context, strongElements, section, source, });
 
-		let index = 0;
-		for (const match of source.matchAll(regex)) {
-			// console.log(match);
+        let strongElementIndex = 0;
+        let acceptableIndex = 0;
+        for (const match of source.matchAll(regex)) {
+            if (match.index < acceptableIndex) continue;
 
-			const mark = match[2];
-			if (mark === '__') {
-				strongElements[index]?.classList.add('underline');
+            const mark = match[0];
+            const charBefore = source[match.index - 1] || "";
+            acceptableIndex = match.index + mark.length;
+
+            console.log("match", { match, mark, charBefore, index: strongElementIndex, next: acceptableIndex })
+
+            if (/^$|\s|\n/.test(charBefore)) {
+                if (mark === '__')
+                    strongElements[strongElementIndex]?.classList.add('underline');
+
+				strongElementIndex++;
 			}
-			index++;
-		}
+        }
     };
 }
 
