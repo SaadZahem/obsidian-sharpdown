@@ -1,11 +1,11 @@
 {
-	"id": "the-obsidian-plugin",
-	"name": "The plugin",
+	"id": "obsidian-enhanced-marker",
+	"name": "Enhanced Marker",
 	"version": "1.0.0",
 	"minAppVersion": "1.0.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
+	"description": "Underline text with double underscores",
+	"author": "Saad Zahem",
+	"authorUrl": "https://github.com/SaadZahem",
 	"fundingUrl": "https://obsidian.md/pricing",
 	"isDesktopOnly": false
 }
