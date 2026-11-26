@@ -8,7 +8,7 @@ import {
 } from '@codemirror/view';
 import { RangeSetBuilder } from '@codemirror/state';
 
-export default class EnhancedMarker extends Plugin {
+export default class SuperMarkdown extends Plugin {
     async onload() {
         // 1. Register CodeMirror extension for Live Preview
         this.registerEditorExtension(UnderlineViewPlugin);

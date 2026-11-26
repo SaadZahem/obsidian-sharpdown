@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-enhanced-marker",
+	"name": "obsidian-sharpdown",
 	"version": "1.0.0",
-	"description": "Underline text with double underscore",
+	"description": "Extends and enhances obsidian markdown syntax",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {

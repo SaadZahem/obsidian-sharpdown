@@ -1,7 +1,7 @@
-# Obsidian Enhanced Marker Plugin
+# Obsidian Sharpdown Plugin
 
 **Still under development**.
-Enhances the markdown syntax.
+Extends and enhances obsidian markdown syntax.
 
 ## Features
 
@@ -59,11 +59,11 @@ Note that this plugin doesn't support the following:
 1. Underlining text in review mode
 2. The syntax `*__foo__*` will create bold inside italic.
    Use triple underscores for italic underline or triple asterisks for italic bold.
-3. The example `old __ crispy __ and **fresh**` will underline both words.
+3. The example `new __ crispy __ and **fresh**` will underline both words.
 4. There's no dedicated hotkey for inserting double underscores yet.
 
 ## About
 
 Developed by [Saad Zahem](https://github.com/SaadZahem).
 
-Contributions are welcome, [GitHub repo](https://github.com/SaadZahem/obsidian-enhanced-marker)
+Contributions are welcome, [GitHub repo](https://github.com/SaadZahem/obsidian-sharpdown)

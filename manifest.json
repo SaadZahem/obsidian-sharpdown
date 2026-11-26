@@ -1,11 +1,11 @@
 {
-	"id": "obsidian-enhanced-marker",
-	"name": "Enhanced Marker",
+	"id": "obsidian-sharpdown",
+	"name": "Sharpdown",
 	"version": "1.0.0",
 	"minAppVersion": "1.0.0",
-	"description": "Underline text with double underscores",
+	"description": "Extends and enhances obsidian markdown syntax",
 	"author": "Saad Zahem",
 	"authorUrl": "https://github.com/SaadZahem",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"fundingUrl": "https://github.com/SaadZahem/obsidian-sharpdown",
 	"isDesktopOnly": false
 }
