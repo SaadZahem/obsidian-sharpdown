@@ -26,8 +26,8 @@ export default class EnhancedMarker extends Plugin {
         const source = section.text.split("\n").slice(section.lineStart, section.lineEnd + 1).join("\n");
         const regex = /\*\*|__/g;
 
-        element.dataset.source = source;
-        console.log("process", { element, context, strongElements, section, source, });
+        // element.dataset.source = source;
+        // console.log("process", { element, context, strongElements, section, source, });
 
         let strongElementIndex = 0;
         let acceptableIndex = 0;
@@ -39,7 +39,7 @@ export default class EnhancedMarker extends Plugin {
             const isOpening = match.index == acceptableIndex || /^$|\s|\n/.test(charBefore);
             acceptableIndex = match.index + mark.length;
 
-            console.log("match", { match, mark, charBefore, index: strongElementIndex, next: acceptableIndex })
+            // console.log("match", { match, mark, charBefore, index: strongElementIndex, next: acceptableIndex })
 
             if (isOpening) {
                 if (mark === '__') {
