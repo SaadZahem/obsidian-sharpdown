@@ -21,14 +21,16 @@ export default class EnhancedMarker extends Plugin {
     private underlinePostProcessor = (element: HTMLElement, context: MarkdownPostProcessorContext) => {
         const strongElements = element.findAll('strong');
 		const section = context.getSectionInfo(element);
-		const paragraphs = section?.text.split("\n\n");
-		const paragraphIndex = element.parentElement?.indexOf(element) || 2;
-		const source = paragraphs?.[paragraphIndex - 2] || "";
+		if (!section) return;
+
+		const source = section.text.split("\n").slice(section.lineStart, section.lineEnd + 1).join("\n");
 		const regex = /(^|\s)(\*\*|__)/g;
+
+		// console.log({ element, context, section, source, });
 
 		let index = 0;
 		for (const match of source.matchAll(regex)) {
-			console.log(match);
+			// console.log(match);
 
 			const mark = match[2];
 			if (mark === '__') {
