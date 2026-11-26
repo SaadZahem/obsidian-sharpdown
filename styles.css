@@ -1,9 +1,4 @@
-.underline {
-  text-decoration: underline !important;
-}
-
-/* Allows bold syntax (**bar**) inside underline text to stay bold */
-.underline strong,
-.underline b {
-  font-weight: bold !important;
+strong.underline {
+  text-decoration: underline;
+  font-weight: inherit;
 }

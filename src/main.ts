@@ -24,31 +24,17 @@ export default class EnhancedMarker extends Plugin {
 		const paragraphs = section?.text.split("\n\n");
 		const paragraphIndex = element.parentElement?.indexOf(element) || 2;
 		const source = paragraphs?.[paragraphIndex - 2] || "";
-		const pattern = /\*\*|__/g;
+		const regex = /(^|\s)(\*\*|__)/g;
 
 		let index = 0;
-		for (const match of source.matchAll(pattern)) {
-			const mark = match[0];
-			const charBefore = match.index > 0 ? source[match.index - 1] : null;
-			const charAfter = match.index + match.length < source.length ? source[match.index + match.length] : null;
-			const isOpening = charBefore === ' ' || charBefore == null;
-			const isClosing = charAfter === ' ' || charAfter == null;
+		for (const match of source.matchAll(regex)) {
+			console.log(match);
 
-			if (isOpening) {
-				if (mark === '__') {
-					const strongEl = strongElements[index];
-
-					if (strongEl) {
-						const underlineEl = strongEl.createEl('u');
-						underlineEl.innerHTML = strongEl.innerHTML;
-						strongEl.replaceWith(underlineEl);
-					}
-				}
-				index += 1
-
-			} else if (isClosing) {
-
+			const mark = match[2];
+			if (mark === '__') {
+				strongElements[index]?.classList.add('underline');
 			}
+			index++;
 		}
     };
 }
