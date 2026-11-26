@@ -1,18 +1,24 @@
-/*
-
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
-
-If your plugin does not need CSS, delete this file.
-
-*/
+/* Base custom underline style */
 .obsidian-custom-underline {
   text-decoration: underline !important;
   font-weight: normal;
 }
 
-/* Allows bold syntax (**bar**) inside underline text to stay bold */
+/* Allow bold (**bar**) inside underline to remain bold */
 .obsidian-custom-underline strong,
 .obsidian-custom-underline b {
   font-weight: bold !important;
+}
+
+/* Allow italic (*bar*) inside underline to remain italic */
+.obsidian-custom-underline em,
+.obsidian-custom-underline i {
+  font-style: italic !important;
+}
+
+/* Handle underline inside bold (** __bar__ **): text should be both bold and underlined */
+strong .obsidian-custom-underline,
+b .obsidian-custom-underline {
+  font-weight: bold !important;
+  text-decoration: underline !important;
 }

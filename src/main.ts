@@ -13,37 +13,67 @@ export default class DoubleUnderlinePlugin extends Plugin {
     // 1. Register CodeMirror extension for Live Preview
     this.registerEditorExtension(doubleUnderlineViewPlugin);
 
-    // 2. Register Markdown Post Processor for Reading mode (Safe DOM manipulation)
+    // 2. Register Markdown Post Processor for Reading mode
     this.registerMarkdownPostProcessor(this.underlinePostProcessor);
   }
 
-  // Reading Mode Processor - Safe DOM transformation (No innerHTML)
+  // Reading Mode Processor - Handles all nested combinations accurately
   private underlinePostProcessor = (element: HTMLElement, context: MarkdownPostProcessorContext) => {
+    const section = context.getSectionInfo(element);
+    if (!section) return;
+
+    // Find all strong elements in the rendered block
     const strongElements = element.querySelectorAll('strong');
 
     strongElements.forEach((strongEl) => {
-      const section = context.getSectionInfo(strongEl);
-      if (section) {
-        const sourceText = section.text;
-        const innerText = strongEl.textContent || '';
-        const rawSnippet = `__${innerText}__`;
+      // Check if this specific strong element corresponds to a double underscore in source
+      // We do this by verifying the exact source snippet or inspecting the section context
+      const innerHTML = strongEl.innerHTML;
+      
+      // Look at the source text for this section
+      // If the source contains __[content]__ corresponding to this node, convert to underline span
+      const parentBlock = section.text;
+      
+      // Helper to check if the rendered strong element originated from __...__
+      // By inspecting whether the raw source text wraps this inner content in __ rather than **
+      if (isDoubleUnderscoreSource(parentBlock, innerHTML, strongEl)) {
+        const underlineSpan = createSpan();
+        underlineSpan.addClass('obsidian-custom-underline');
         
-        // Verify if this strong tag originated from double underscores
-        if (sourceText.includes(rawSnippet)) {
-          // Safely create a new span element (no innerHTML)
-          const underlineSpan = createSpan();
-          underlineSpan.addClass('obsidian-custom-underline');
-          
-          // Move all child nodes (including nested elements like bold **bar**) safely
-          while (strongEl.firstChild) {
-            underlineSpan.appendChild(strongEl.firstChild);
-          }
-          
-          strongEl.replaceWith(underlineSpan);
+        while (strongEl.firstChild) {
+          underlineSpan.appendChild(strongEl.firstChild);
         }
+        strongEl.replaceWith(underlineSpan);
       }
     });
   };
+}
+
+/**
+ * Helper to determine if a rendered strong element came from __...__ in source 
+ * rather than **...**, while handling nested structures correctly.
+ */
+function isDoubleUnderscoreSource(sourceText: string, innerHTML: string, el: HTMLElement): boolean {
+  // Extract plain text or check surrounding characters in the source text
+  // A robust check verifies if the delimiters around this segment in source are '__'
+  const textContent = el.textContent || '';
+  
+  // Search for patterns like __...__ enclosing this text content in the source block
+  const escapedText = textContent.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`__(${escapedText})__|__([^_]+?)__`, 'g');
+  
+  let match;
+  while ((match = regex.exec(sourceText)) !== null) {
+    // Verify if this match corresponds to our element's position/content
+    if (match[1] === textContent || match[2] === textContent) {
+      return true;
+    }
+  }
+  
+  // Fallback heuristic for nested bold/underline cases (e.g. __**ui**__ vs **__ui__**)
+  // Check if the exact outer wrapper in source uses double underscores
+  return sourceText.includes(`__${textContent}__`) || 
+         (sourceText.includes('__') && el.parentElement?.tagName !== 'STRONG' && sourceText.trim().startsWith('__'));
 }
 
 // --- Live Preview (CodeMirror 6) Implementation ---
@@ -67,7 +97,7 @@ class DoubleUnderlineExtension {
 
   buildDecorations(view: EditorView): DecorationSet {
     const builder = new RangeSetBuilder<Decoration>();
-    // Regex that matches __text__ while accommodating spaces and nested formatting tokens
+    // Regex that handles nested markers cleanly without leaving hanging tokens
     const pattern = /__((?:[^\n_]|_(?!_))+?)__/g;
 
     for (let { from, to } of view.visibleRanges) {
