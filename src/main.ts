@@ -36,16 +36,17 @@ export default class EnhancedMarker extends Plugin {
 
             const mark = match[0];
             const charBefore = source[match.index - 1] || "";
+            const isOpening = match.index == acceptableIndex || /^$|\s|\n/.test(charBefore);
             acceptableIndex = match.index + mark.length;
 
             console.log("match", { match, mark, charBefore, index: strongElementIndex, next: acceptableIndex })
 
-            if (/^$|\s|\n/.test(charBefore)) {
-                if (mark === '__')
+            if (isOpening) {
+                if (mark === '__') {
                     strongElements[strongElementIndex]?.classList.add('underline');
-
-				strongElementIndex++;
-			}
+                }
+                strongElementIndex++;
+            }
         }
     };
 }
@@ -92,3 +93,5 @@ class UnderlineExtension {
 const UnderlineViewPlugin = ViewPlugin.fromClass(UnderlineExtension, {
     decorations: v => v.decorations,
 });
+
+// vim: et sw=4 sts=4 ts=4
