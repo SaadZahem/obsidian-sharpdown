@@ -1,7 +1,7 @@
 # Obsidian Sharpdown Plugin
 
 **Still under development**.
-Extends and enhances obsidian markdown syntax.
+Extends and enhances the markdown syntax.
 
 ## Features
 

@@ -1,19 +1,7 @@
 import { Plugin, MarkdownPostProcessorContext } from 'obsidian';
-import { 
-    EditorView, 
-    Decoration, 
-    DecorationSet, 
-    ViewPlugin, 
-    ViewUpdate 
-} from '@codemirror/view';
-import { RangeSetBuilder } from '@codemirror/state';
 
 export default class Sharpdown extends Plugin {
     async onload() {
-        // 1. Register CodeMirror extension for Live Preview
-        this.registerEditorExtension(UnderlineViewPlugin);
-
-        // 2. Register Markdown Post Processor for Reading mode (Safe DOM manipulation)
         this.registerMarkdownPostProcessor(this.underlinePostProcessor);
     }
 
@@ -50,48 +38,3 @@ export default class Sharpdown extends Plugin {
         }
     };
 }
-
-// --- Live Preview (CodeMirror 6) Implementation ---
-
-const underlineDecoration = Decoration.mark({
-    class: 'underline',
-});
-
-class UnderlineExtension {
-    decorations: DecorationSet;
-
-    constructor(view: EditorView) {
-        this.decorations = this.buildDecorations(view);
-    }
-
-    update(update: ViewUpdate) {
-        if (update.docChanged || update.viewportChanged) {
-            this.decorations = this.buildDecorations(update.view);
-        }
-    }
-
-    buildDecorations(view: EditorView): DecorationSet {
-        const builder = new RangeSetBuilder<Decoration>();
-        // Regex that matches __text__ while accommodating spaces and nested formatting tokens
-        const pattern = /__((?:[^\n_]|_(?!_))+?)__/g;
-
-        for (let { from, to } of view.visibleRanges) {
-            let text = view.state.doc.sliceString(from, to);
-            let match;
-
-            while ((match = pattern.exec(text)) !== null) {
-                let start = from + match.index;
-                let end = start + match[0].length;
-                
-                builder.add(start, end, underlineDecoration);
-            }
-        }
-        return builder.finish();
-    }
-}
-
-const UnderlineViewPlugin = ViewPlugin.fromClass(UnderlineExtension, {
-    decorations: v => v.decorations,
-});
-
-// vim: et sw=4 sts=4 ts=4

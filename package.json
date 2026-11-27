@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-sharpdown",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "Extends and enhances obsidian markdown syntax",
 	"main": "main.js",
 	"type": "module",
