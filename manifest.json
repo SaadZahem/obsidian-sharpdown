@@ -1,7 +1,7 @@
 {
 	"id": "sharpdown",
 	"name": "Sharpdown",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"minAppVersion": "1.0.0",
 	"description": "Extends and enhances obsidian markdown syntax",
 	"author": "Saad Zahem",
